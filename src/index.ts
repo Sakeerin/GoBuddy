@@ -13,6 +13,7 @@ import routingRoutes from '@/routes/routing.routes';
 import costingRoutes from '@/routes/costing.routes';
 import bookingRoutes from '@/routes/booking.routes';
 import replanRoutes from '@/routes/replan.routes';
+import sharingRoutes from '@/routes/sharing.routes';
 import { providerRegistry } from '@/services/providers/provider-registry';
 import { StubActivityProvider } from '@/services/providers/stub-activity.provider';
 
@@ -51,6 +52,7 @@ app.use('/pois', poiRoutes);
 app.use('/providers', bookingRoutes);
 app.use('/webhooks', bookingRoutes);
 app.use('/trips', replanRoutes);
+app.use('/trips', sharingRoutes);
 
 // 404 handler
 app.use((req, res) => {

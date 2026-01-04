@@ -211,6 +211,17 @@ GoBuddy/
 - `POST /trips/:tripId/replan/apply` - Apply replan proposal
 - `POST /trips/:tripId/replan/rollback` - Rollback replan
 
+### Sharing & Collaboration
+- `POST /trips/:tripId/shares` - Create share link
+- `GET /trips/:tripId/shares` - List shares for trip
+- `DELETE /trips/:tripId/shares/:shareToken` - Revoke share
+- `GET /trips/shared/:shareToken` - Access shared trip
+- `GET /trips/:tripId/shares/audit` - Get share audit log
+
+### Execution Mode
+- `GET /trips/:tripId/today` - Get today's view
+- `GET /trips/:tripId/offline-cache` - Get offline cache
+
 ### POIs
 - `GET /pois/search` - Search POIs with filters
 - `GET /pois/:id` - Get POI details
@@ -283,8 +294,11 @@ See `src/migrations/001_initial_schema.sql` for full schema.
 - T5.2: Replan proposal generator (1-3 options) + diff
 - T5.3: Apply replan transactionally + rollback
 
+**Epic 6: Share + Execution Mode** ✅ Completed
+- T6.1: Share view-only link + permissions
+- T6.2: Today view + navigation links + offline read cache
+
 **Next Steps:**
-- Epic 6: Share + Execution Mode
 - Epic 7: Admin + Observability
 
 ## Documentation
