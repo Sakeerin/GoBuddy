@@ -12,6 +12,7 @@ import itineraryRoutes from '@/routes/itinerary.routes';
 import routingRoutes from '@/routes/routing.routes';
 import costingRoutes from '@/routes/costing.routes';
 import bookingRoutes from '@/routes/booking.routes';
+import replanRoutes from '@/routes/replan.routes';
 import { providerRegistry } from '@/services/providers/provider-registry';
 import { StubActivityProvider } from '@/services/providers/stub-activity.provider';
 
@@ -49,6 +50,7 @@ app.use('/costing', costingRoutes);
 app.use('/pois', poiRoutes);
 app.use('/providers', bookingRoutes);
 app.use('/webhooks', bookingRoutes);
+app.use('/trips', replanRoutes);
 
 // 404 handler
 app.use((req, res) => {

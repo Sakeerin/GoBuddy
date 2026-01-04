@@ -202,6 +202,15 @@ GoBuddy/
 - `GET /providers/:providerId/items/:itemId/availability` - Check availability
 - `POST /webhooks/providers/:providerId` - Handle provider webhook
 
+### Events & Replanning
+- `POST /trips/:tripId/events/weather` - Ingest weather event
+- `GET /trips/:tripId/events` - Get event signals
+- `GET /trips/:tripId/replan/triggers` - Get pending replan triggers
+- `POST /trips/:tripId/replan/propose` - Generate replan proposals
+- `GET /trips/:tripId/replan/proposals/:proposalId` - Get proposal details
+- `POST /trips/:tripId/replan/apply` - Apply replan proposal
+- `POST /trips/:tripId/replan/rollback` - Rollback replan
+
 ### POIs
 - `GET /pois/search` - Search POIs with filters
 - `GET /pois/:id` - Get POI details
@@ -269,9 +278,14 @@ See `src/migrations/001_initial_schema.sql` for full schema.
 - T4.2: Provider adapter (Activities - Stub provider)
 - T4.3: Booking UI flow + fallback suggestions
 
+**Epic 5: Real-time Monitoring + Replan** ✅ Completed
+- T5.1: Weather ingestion + rule triggers
+- T5.2: Replan proposal generator (1-3 options) + diff
+- T5.3: Apply replan transactionally + rollback
+
 **Next Steps:**
-- Epic 5: Real-time Monitoring + Replan
 - Epic 6: Share + Execution Mode
+- Epic 7: Admin + Observability
 
 ## Documentation
 
