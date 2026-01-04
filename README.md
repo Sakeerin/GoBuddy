@@ -164,6 +164,20 @@ GoBuddy/
 - `DELETE /trips/:id` - Delete trip
 - `PATCH /trips/:id/status` - Update trip status
 
+### Itinerary
+- `POST /trips/:tripId/generate` - Generate itinerary
+- `GET /trips/:tripId/itinerary` - Get itinerary
+- `POST /trips/:tripId/days/:day/items/reorder` - Reorder items
+- `PATCH /trips/:tripId/items/:itemId/pin` - Pin/unpin item
+- `PATCH /trips/:tripId/items/:itemId/start-time` - Set start time
+- `DELETE /trips/:tripId/items/:itemId` - Remove item
+- `POST /trips/:tripId/days/:day/items` - Add item
+- `GET /trips/:tripId/itinerary/validate` - Validate itinerary
+- `GET /trips/:tripId/versions` - Get version history
+- `GET /trips/:tripId/versions/:version` - Get specific version
+- `GET /trips/:tripId/versions/:version1/compare/:version2` - Compare versions
+- `POST /trips/:tripId/versions/:version/rollback` - Rollback to version
+
 ### POIs
 - `GET /pois/search` - Search POIs with filters
 - `GET /pois/:id` - Get POI details
@@ -217,9 +231,14 @@ See `src/migrations/001_initial_schema.sql` for full schema.
 - T1.2: Trip CRUD + preferences schema
 - T1.3: POI search + details + tags
 
+**Epic 2: Itinerary Generator v1** ✅ Completed
+- T2.1: Itinerary generate endpoint + engine skeleton
+- T2.2: Itinerary editor (drag/reorder/pin) + validation
+- T2.3: Versioning (trip snapshots)
+
 **Next Steps:**
-- Epic 2: Itinerary Generator v1
 - Epic 3: Routing + Costing
+- Epic 4: Booking Orchestrator
 
 ## Documentation
 
