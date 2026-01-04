@@ -9,6 +9,8 @@ import authRoutes from '@/routes/auth.routes';
 import tripRoutes from '@/routes/trip.routes';
 import poiRoutes from '@/routes/poi.routes';
 import itineraryRoutes from '@/routes/itinerary.routes';
+import routingRoutes from '@/routes/routing.routes';
+import costingRoutes from '@/routes/costing.routes';
 
 // Load environment variables
 dotenv.config();
@@ -32,6 +34,10 @@ app.get('/health', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/trips', tripRoutes);
 app.use('/trips', itineraryRoutes);
+app.use('/trips', routingRoutes);
+app.use('/trips', costingRoutes);
+app.use('/routing', routingRoutes);
+app.use('/costing', costingRoutes);
 app.use('/pois', poiRoutes);
 
 // 404 handler

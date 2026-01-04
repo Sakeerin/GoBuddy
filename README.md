@@ -178,6 +178,17 @@ GoBuddy/
 - `GET /trips/:tripId/versions/:version1/compare/:version2` - Compare versions
 - `POST /trips/:tripId/versions/:version/rollback` - Rollback to version
 
+### Routing
+- `POST /routing/compute` - Compute route between two points
+- `PATCH /trips/:tripId/items/:itemId/route` - Update route mode for item
+- `POST /trips/:tripId/routes/update-all` - Update all routes in itinerary
+- `GET /routing/providers` - Get available routing providers
+
+### Costing
+- `GET /trips/:tripId/cost-breakdown` - Get cost breakdown for itinerary
+- `POST /costing/convert-currency` - Convert currency amount
+- `PATCH /trips/:tripId/items/:itemId/cost` - Update item cost
+
 ### POIs
 - `GET /pois/search` - Search POIs with filters
 - `GET /pois/:id` - Get POI details
@@ -236,9 +247,13 @@ See `src/migrations/001_initial_schema.sql` for full schema.
 - T2.2: Itinerary editor (drag/reorder/pin) + validation
 - T2.3: Versioning (trip snapshots)
 
+**Epic 3: Routing + Costing** ✅ Completed
+- T3.1: RouteSegment compute + update modes
+- T3.2: Costing service (estimate) + breakdown
+
 **Next Steps:**
-- Epic 3: Routing + Costing
 - Epic 4: Booking Orchestrator
+- Epic 5: Real-time Monitoring + Replan
 
 ## Documentation
 
