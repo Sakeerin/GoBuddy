@@ -11,6 +11,9 @@ import poiRoutes from '@/routes/poi.routes';
 import itineraryRoutes from '@/routes/itinerary.routes';
 import routingRoutes from '@/routes/routing.routes';
 import costingRoutes from '@/routes/costing.routes';
+import bookingRoutes from '@/routes/booking.routes';
+import { providerRegistry } from '@/services/providers/provider-registry';
+import { StubActivityProvider } from '@/services/providers/stub-activity.provider';
 
 // Load environment variables
 dotenv.config();
@@ -30,15 +33,22 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', timestamp: new Date().toISOString() });
 });
 
+// Register providers
+const stubActivityProvider = new StubActivityProvider();
+providerRegistry.register('stub-activity', stubActivityProvider);
+
 // Routes
 app.use('/auth', authRoutes);
 app.use('/trips', tripRoutes);
 app.use('/trips', itineraryRoutes);
 app.use('/trips', routingRoutes);
 app.use('/trips', costingRoutes);
+app.use('/trips', bookingRoutes);
 app.use('/routing', routingRoutes);
 app.use('/costing', costingRoutes);
 app.use('/pois', poiRoutes);
+app.use('/providers', bookingRoutes);
+app.use('/webhooks', bookingRoutes);
 
 // 404 handler
 app.use((req, res) => {

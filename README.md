@@ -189,6 +189,19 @@ GoBuddy/
 - `POST /costing/convert-currency` - Convert currency amount
 - `PATCH /trips/:tripId/items/:itemId/cost` - Update item cost
 
+### Booking
+- `POST /trips/:tripId/bookings` - Create booking
+- `GET /trips/:tripId/bookings` - List bookings for trip
+- `GET /trips/:tripId/bookings/:bookingId` - Get booking details
+- `GET /trips/:tripId/bookings/:bookingId/history` - Get booking state history
+- `POST /trips/:tripId/bookings/:bookingId/retry` - Retry failed booking
+- `POST /trips/:tripId/bookings/:bookingId/cancel` - Cancel booking
+- `GET /trips/:tripId/bookings/:bookingId/alternatives` - Get alternative options
+- `GET /providers/:providerId/search` - Search items from provider
+- `GET /providers/:providerId/items/:itemId` - Get item details
+- `GET /providers/:providerId/items/:itemId/availability` - Check availability
+- `POST /webhooks/providers/:providerId` - Handle provider webhook
+
 ### POIs
 - `GET /pois/search` - Search POIs with filters
 - `GET /pois/:id` - Get POI details
@@ -251,9 +264,14 @@ See `src/migrations/001_initial_schema.sql` for full schema.
 - T3.1: RouteSegment compute + update modes
 - T3.2: Costing service (estimate) + breakdown
 
+**Epic 4: Booking Orchestrator (Provider 1)** ✅ Completed
+- T4.1: Booking state machine + idempotency
+- T4.2: Provider adapter (Activities - Stub provider)
+- T4.3: Booking UI flow + fallback suggestions
+
 **Next Steps:**
-- Epic 4: Booking Orchestrator
 - Epic 5: Real-time Monitoring + Replan
+- Epic 6: Share + Execution Mode
 
 ## Documentation
 
