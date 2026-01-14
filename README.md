@@ -222,6 +222,23 @@ GoBuddy/
 - `GET /trips/:tripId/today` - Get today's view
 - `GET /trips/:tripId/offline-cache` - Get offline cache
 
+### Admin
+- `POST /admin/users/:userId/make-admin` - Create admin user
+- `GET /admin/providers` - List providers
+- `POST /admin/providers` - Create provider
+- `GET /admin/providers/:providerId` - Get provider details
+- `PATCH /admin/providers/:providerId` - Update provider
+- `DELETE /admin/providers/:providerId` - Delete provider
+- `GET /admin/providers/:providerId/health` - Check provider health
+- `GET /admin/webhooks` - List webhook logs
+- `POST /admin/webhooks/:logId/retry` - Retry failed webhook
+- `GET /admin/bookings/:bookingId/troubleshoot` - Get booking troubleshooting info
+- `POST /admin/bookings/:bookingId/resend-voucher` - Resend voucher
+- `POST /admin/bookings/:bookingId/override-status` - Override booking status
+- `GET /admin/bookings/statistics` - Get booking statistics
+- `GET /admin/audit-log` - Get admin audit log
+- `GET /admin/metrics` - Get system metrics
+
 ### POIs
 - `GET /pois/search` - Search POIs with filters
 - `GET /pois/:id` - Get POI details
@@ -298,8 +315,11 @@ See `src/migrations/001_initial_schema.sql` for full schema.
 - T6.1: Share view-only link + permissions
 - T6.2: Today view + navigation links + offline read cache
 
-**Next Steps:**
-- Epic 7: Admin + Observability
+**Epic 7: Admin + Observability** ✅ Completed
+- T7.1: Admin console minimal (providers, logs)
+- T7.2: Observability baseline
+
+**All Core Epics Completed!** 🎉
 
 ## Documentation
 

@@ -14,6 +14,8 @@ import costingRoutes from '@/routes/costing.routes';
 import bookingRoutes from '@/routes/booking.routes';
 import replanRoutes from '@/routes/replan.routes';
 import sharingRoutes from '@/routes/sharing.routes';
+import adminRoutes from '@/routes/admin.routes';
+import { metricsMiddleware } from '@/middleware/metrics.middleware';
 import { providerRegistry } from '@/services/providers/provider-registry';
 import { StubActivityProvider } from '@/services/providers/stub-activity.provider';
 
@@ -29,6 +31,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(requestIdMiddleware);
+app.use(metricsMiddleware);
 
 // Health check
 app.get('/health', (req, res) => {
@@ -53,6 +56,7 @@ app.use('/providers', bookingRoutes);
 app.use('/webhooks', bookingRoutes);
 app.use('/trips', replanRoutes);
 app.use('/trips', sharingRoutes);
+app.use('/admin', adminRoutes);
 
 // 404 handler
 app.use((req, res) => {

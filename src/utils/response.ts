@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { ApiResponse, ApiError } from '@/types';
 import { AppError } from './errors';
 import { logger } from './logger';
+import { metricsService } from '@/services/observability/metrics.service';
 
 export function successResponse<T>(
   res: Response,
