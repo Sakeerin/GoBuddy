@@ -41,3 +41,13 @@ export async function query(text: string, params?: unknown[]) {
   }
 }
 
+/**
+ * Get database connection pool stats
+ */
+export function getPoolStats() {
+  return {
+    total: pool.totalCount,
+    idle: pool.idleCount,
+    waiting: pool.waitingCount,
+  };
+}

@@ -59,8 +59,22 @@ export class BookingTroubleshootingService {
       throw new NotFoundError('Voucher', bookingId);
     }
 
-    // TODO: Implement email sending
-    // For now, just log the action
+    // Send voucher email
+    try {
+      const { sendBookingConfirmationEmail } = await import('@/utils/email.service');
+      await sendBookingConfirmationEmail(booking.contact_info.email, {
+        confirmationNumber: booking.confirmation_number,
+        itemName: booking.external_booking_id, // Use booking reference as item name
+        date: booking.booking_date,
+        time: booking.booking_time || undefined,
+        voucherUrl: booking.voucher_url || undefined,
+      });
+      logger.info('Voucher email sent', { bookingId, email: booking.contact_info.email });
+    } catch (error) {
+      logger.warn('Failed to send voucher email', { bookingId, error });
+      // Continue anyway - action is logged
+    }
+
     await adminService.logAdminAction(
       adminId,
       'voucher_resent',

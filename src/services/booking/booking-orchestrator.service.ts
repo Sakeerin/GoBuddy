@@ -205,8 +205,32 @@ export class BookingOrchestratorService {
       const webhookEvent = await provider.handleWebhook(payload);
 
       // Find booking by external ID
-      const bookingResult = await bookingService.getBookingsByTripId(''); // We need to search differently
-      // TODO: Add method to find booking by external ID
+      const { query } = await import('@/config/database');
+      const bookingResult = await query(
+        `SELECT * FROM bookings WHERE external_booking_id = $1 AND provider_id = $2`,
+        [webhookEvent.provider_booking_id, providerId]
+      );
+
+      if (bookingResult.rows.length > 0) {
+        const booking = await bookingService.getBookingById(bookingResult.rows[0].id);
+        
+        // Update booking based on webhook event
+        if (webhookEvent.event_type === 'booking_confirmed') {
+          await bookingService.updateBookingStatus(
+            booking.id,
+            'confirmed',
+            'Confirmed via webhook',
+            'system'
+          );
+        } else if (webhookEvent.event_type === 'booking_canceled') {
+          await bookingService.updateBookingStatus(
+            booking.id,
+            'canceled',
+            'Canceled via webhook',
+            'system'
+          );
+        }
+      }
 
       logger.info('Webhook processed', {
         providerId,

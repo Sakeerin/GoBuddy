@@ -1,12 +1,11 @@
 import { v4 as uuidv4 } from 'uuid';
-import { query } from '@/config/database';
+import { query, pool } from '@/config/database';
 import { itineraryGeneratorService } from '@/services/itinerary/itinerary-generator.service';
 import { itineraryVersionService } from '@/services/itinerary/itinerary-version.service';
 import { replanEngineService } from './replan-engine.service';
 import { eventMonitorService } from '@/services/events/event-monitor.service';
 import { logger } from '@/utils/logger';
 import { NotFoundError, ValidationError } from '@/utils/errors';
-import { Itinerary, ItineraryItem } from '@/types/itinerary';
 import {
   ReplanProposal,
   ApplyReplanRequest,
@@ -45,16 +44,18 @@ export class ReplanApplyService {
       previousVersion || undefined
     );
 
-    // Start transaction (using BEGIN/COMMIT/ROLLBACK)
-    await query('BEGIN', []);
+    // Start transaction using pool client
+    const client = await pool.connect();
 
     try {
+      await client.query('BEGIN');
+
       // Apply changes
-      await this.applyChanges(proposal, currentItinerary);
+      await this.applyChangesWithClient(client, proposal, currentItinerary);
 
       // Update itinerary version
       const newVersion = currentItinerary.version + 1;
-      await query(
+      await client.query(
         `UPDATE itineraries SET version = $1, generated_at = NOW() WHERE trip_id = $2`,
         [newVersion, proposal.trip_id]
       );
@@ -64,20 +65,20 @@ export class ReplanApplyService {
       const rollbackUntil = new Date();
       rollbackUntil.setHours(rollbackUntil.getHours() + ROLLBACK_WINDOW_HOURS);
 
-      await query(
+      await client.query(
         `INSERT INTO replan_applications (
           id, trip_id, proposal_id, applied_version, rollback_available_until
         ) VALUES ($1, $2, $3, $4, $5)`,
         [applicationId, proposal.trip_id, proposal.id, newVersion, rollbackUntil]
       );
 
-      // Mark trigger as processed
+      // Commit transaction
+      await client.query('COMMIT');
+
+      // Mark trigger as processed (outside transaction)
       if (proposal.trigger_id) {
         await eventMonitorService.markTriggerProcessed(proposal.trigger_id);
       }
-
-      // Commit transaction
-      await query('COMMIT', []);
 
       logger.info('Replan proposal applied', {
         proposalId: proposal.id,
@@ -93,19 +94,22 @@ export class ReplanApplyService {
       };
     } catch (error) {
       // Rollback transaction
-      await query('ROLLBACK', []);
+      await client.query('ROLLBACK');
       logger.error('Failed to apply replan proposal', {
         proposalId: proposal.id,
         error,
       });
       throw error;
+    } finally {
+      client.release();
     }
   }
 
   /**
-   * Apply changes from proposal
+   * Apply changes from proposal (with transaction client)
    */
-  private async applyChanges(
+  private async applyChangesWithClient(
+    client: any,
     proposal: ReplanProposal,
     itinerary: Itinerary
   ): Promise<void> {
@@ -113,7 +117,7 @@ export class ReplanApplyService {
 
     // Remove items
     for (const removed of changes.removed_items) {
-      await query(
+      await client.query(
         `DELETE FROM itinerary_items WHERE id = $1 AND trip_id = $2`,
         [removed.item_id, proposal.trip_id]
       );
@@ -122,14 +126,14 @@ export class ReplanApplyService {
     // Replace items
     for (const replaced of changes.replaced_items) {
       // Delete old item
-      await query(
+      await client.query(
         `DELETE FROM itinerary_items WHERE id = $1 AND trip_id = $2`,
         [replaced.old_item_id, proposal.trip_id]
       );
 
       // Insert new item
       const item = replaced.new_item;
-      await query(
+      await client.query(
         `INSERT INTO itinerary_items (
           id, trip_id, day, item_type, poi_id, name, start_time, end_time,
           duration_minutes, is_pinned, "order", location, cost_estimate
@@ -154,7 +158,7 @@ export class ReplanApplyService {
 
     // Move items
     for (const moved of changes.moved_items) {
-      await query(
+      await client.query(
         `UPDATE itinerary_items
          SET day = $1, start_time = $2, end_time = $3, updated_at = NOW()
          WHERE id = $4 AND trip_id = $5`,
@@ -170,7 +174,7 @@ export class ReplanApplyService {
 
     // Add items
     for (const added of changes.added_items) {
-      await query(
+      await client.query(
         `INSERT INTO itinerary_items (
           id, trip_id, day, item_type, poi_id, name, start_time, end_time,
           duration_minutes, is_pinned, "order", location
@@ -205,7 +209,24 @@ export class ReplanApplyService {
     changes.added_items.forEach((a) => affectedDays.add(a.day));
 
     for (const day of affectedDays) {
-      await this.recalculateDayOrder(proposal.trip_id, day);
+      await this.recalculateDayOrderWithClient(client, proposal.trip_id, day);
+    }
+  }
+
+  /**
+   * Apply changes from proposal (legacy method for non-transactional use)
+   */
+  private async applyChanges(
+    proposal: ReplanProposal,
+    itinerary: Itinerary
+  ): Promise<void> {
+    // This method is kept for backward compatibility
+    // In practice, use applyChangesWithClient for transactional operations
+    const client = await pool.connect();
+    try {
+      await this.applyChangesWithClient(client, proposal, itinerary);
+    } finally {
+      client.release();
     }
   }
 
@@ -337,6 +358,20 @@ export class ReplanApplyService {
     // For simplicity, assume same duration
     const duration = 120; // Default 2 hours
     return this.addMinutes(newStartTime, duration);
+  }
+
+  private recalculateDayOrderWithClient(client: any, tripId: string, day: number): Promise<void> {
+    return client.query(
+      `UPDATE itinerary_items
+       SET "order" = sub.row_num - 1
+       FROM (
+         SELECT id, ROW_NUMBER() OVER (ORDER BY start_time) as row_num
+         FROM itinerary_items
+         WHERE trip_id = $1 AND day = $2
+       ) sub
+       WHERE itinerary_items.id = sub.id`,
+      [tripId, day]
+    ).then(() => undefined);
   }
 
   private recalculateDayOrder(tripId: string, day: number): Promise<void> {

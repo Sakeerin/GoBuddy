@@ -2,6 +2,7 @@ import { query } from '@/config/database';
 import { getRedisClient } from '@/config/redis';
 import { logger } from '@/utils/logger';
 import { ConflictError, ValidationError } from '@/utils/errors';
+import { sendOTPEmail } from '@/utils/email.service';
 
 const OTP_LENGTH = parseInt(process.env.OTP_LENGTH || '6', 10);
 const OTP_EXPIRES_IN = parseInt(process.env.OTP_EXPIRES_IN || '300', 10); // 5 minutes
@@ -48,12 +49,15 @@ export class OTPService {
       logger.warn('Redis OTP storage failed, using DB only', err);
     }
 
-    // TODO: Send email via nodemailer
-    // For now, log the OTP (remove in production!)
-    logger.info('OTP generated', { email, code });
-
-    // In production, send email:
-    // await sendEmail(email, 'Your GoBuddy OTP', `Your OTP code is: ${code}`);
+    // Send OTP email
+    try {
+      await sendOTPEmail(email, code);
+      logger.info('OTP email sent', { email });
+    } catch (error) {
+      logger.error('Failed to send OTP email, but OTP is stored', { email, error });
+      // Don't throw - OTP is still stored and can be verified
+      // In production, you might want to throw or use a queue
+    }
   }
 
   /**

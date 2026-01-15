@@ -1,4 +1,4 @@
-import { query } from '@/config/database';
+import { query, getPoolStats } from '@/config/database';
 import { logger } from '@/utils/logger';
 
 export interface SystemMetrics {
@@ -185,7 +185,7 @@ export class MetricsService {
     return {
       uptime_seconds: uptime,
       memory_usage_mb: Math.round(memoryUsage * 100) / 100,
-      database_connections: 0, // TODO: Get from pool
+      database_connections: getPoolStats().total,
     };
   }
 

@@ -21,8 +21,25 @@ export class BookingAlternativesService {
     // Get original item location if available
     let location: SearchOptions['location'] | undefined;
     if (booking.itinerary_item_id) {
-      // TODO: Get location from itinerary item
-      // For now, use a default location
+      try {
+        const { itineraryGeneratorService } = await import('@/services/itinerary/itinerary-generator.service');
+        const itinerary = await itineraryGeneratorService.getItineraryByTripId(booking.trip_id);
+        if (itinerary) {
+          for (const day of itinerary.days) {
+            const item = day.items.find((i) => i.id === booking.itinerary_item_id);
+            if (item?.location) {
+              location = {
+                lat: item.location.lat,
+                lng: item.location.lng,
+                radius_km: 5,
+              };
+              break;
+            }
+          }
+        }
+      } catch (error) {
+        logger.warn('Failed to get item location for alternatives', { error });
+      }
     }
 
     const alternatives: BookingOption[] = [];
