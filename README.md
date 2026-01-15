@@ -3,6 +3,9 @@
 
 GoBuddy is an intelligent travel planning system that helps users create trip plans quickly (in minutes) with budget management, complete booking capabilities (flights/cars/hotels/activities) through partners, and real-time plan adjustments during trips based on actual events (rain, sold-out tickets, delays, closures) with alternatives and time/budget impact analysis.
 
+> 🚀 **Quick Start**: See [QUICK_START.md](QUICK_START.md) to get started in 5 minutes!  
+> 🐳 **Docker Setup**: See [DOCKER_SETUP.md](DOCKER_SETUP.md) for detailed Docker instructions.
+
 ## Project Structure
 
 ```
@@ -84,13 +87,36 @@ GoBuddy/
 
 ## Getting Started
 
-### Prerequisites
+### Quick Start with Docker (Recommended)
+
+The easiest way to get started is using Docker:
+
+```bash
+# 1. Clone the repository
+git clone <repository-url>
+cd GoBuddy
+
+# 2. Run automated setup
+npm run docker:setup
+
+# 3. Install dependencies
+npm install
+
+# 4. Start the application
+npm run dev
+```
+
+For detailed Docker setup instructions, see [DOCKER_SETUP.md](DOCKER_SETUP.md).
+
+### Manual Setup
+
+#### Prerequisites
 - Node.js 18+
 - PostgreSQL 14+
 - Redis 6+
 - npm or yarn
 
-### Setup Instructions
+#### Setup Instructions
 
 1. **Clone the repository**
    ```bash

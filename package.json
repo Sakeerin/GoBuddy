@@ -13,7 +13,12 @@
     "lint": "eslint src --ext .ts",
     "lint:fix": "eslint src --ext .ts --fix",
     "migrate": "node dist/migrations/index.js",
-    "migrate:generate": "tsx src/migrations/generate.ts"
+    "migrate:generate": "tsx src/migrations/generate.ts",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:logs": "docker-compose logs -f",
+    "docker:setup": "chmod +x docker/setup.sh && ./docker/setup.sh",
+    "seed": "tsx scripts/seed-demo-data.ts"
   },
   "keywords": [
     "travel",
